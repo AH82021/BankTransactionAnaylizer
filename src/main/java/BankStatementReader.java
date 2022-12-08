@@ -7,24 +7,36 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class BankStatementReader  {
-    private static final String RESOURCES ="src/main/resources/data.csv";
-    public List<BankTransaction> parseFromCSV()  {
-        List bankTransactionList  = null;
-        try {
-            bankTransactionList =
-                    new CsvToBeanBuilder(new FileReader(RESOURCES))
-                    .withType(BankTransaction.class)
-                    .build().
-                    parse();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-       return bankTransactionList;
+public class BankStatementReader  implements BankStatementParser{
 
+  private static DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    public BankTransaction parseFromCSV(String line){
+     String[] columns = line.split(",");
+
+      final  double amount = Double.parseDouble(columns[0]);
+       final String description = columns[1];
+        final LocalDate date = LocalDate.parse(columns[2],df);
+
+        return  new BankTransaction(date,amount,description);
+    }
+
+
+    @Override
+    public List<BankTransaction> parseLinesFromCSV(final List<String> lines){
+        final List<BankTransaction> bankTransactions = new ArrayList<>();
+        for (String line:lines) {
+            bankTransactions.add(parseFromCSV(line));
+        }
+        return bankTransactions;
     }
 
     }

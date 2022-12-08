@@ -5,6 +5,12 @@ import com.opencsv.bean.CsvDate;
 import java.time.LocalDate;
 
 public class BankTransaction {
+    public BankTransaction(LocalDate date, double amount, String description) {
+        this.date = date;
+        this.amount = amount;
+        this.description = description;
+    }
+
     @CsvBindByName(column = "date")
   @CsvDate("dd-MM-yyyy")
     private LocalDate date;
